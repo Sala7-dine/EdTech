@@ -67,4 +67,13 @@ export const authService = {
       },
     };
   },
+
+  async logout(): Promise<{ message: string }> {
+    // Dans un système JWT stateless, le logout est géré côté client
+    // en supprimant le token du localStorage/sessionStorage
+    // Cette méthode confirme simplement l'action
+    return {
+      message: 'Déconnexion réussie',
+    };
+  },
 };
