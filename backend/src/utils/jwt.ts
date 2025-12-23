@@ -1,10 +1,11 @@
 import * as jwt from 'jsonwebtoken';
 import { env } from '../config/env';
+import { Role } from '../enums/role.enum';
 
 interface JwtPayload {
   userId: number;
   email: string;
-  role: string;
+  role: Role;
 }
 
 export const generateToken = (payload: JwtPayload): string => {

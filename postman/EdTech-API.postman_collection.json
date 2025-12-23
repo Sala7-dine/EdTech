@@ -1,8 +1,8 @@
 {
 	"info": {
 		"_postman_id": "edtech-auth-collection",
-		"name": "EdTech - API Authentification",
-		"description": "Collection Postman pour tester l'API d'authentification du système EdTech.\n\n**Base URL:** http://localhost:3000\n\n**Endpoints disponibles:**\n- Inscription (Register)\n- Connexion (Login)\n- Health Check",
+		"name": "EdTech - API Complete",
+		"description": "Collection Postman pour tester l'API EdTech.\n\n**Base URL:** http://localhost:3000\n\n**Modules disponibles:**\n- Authentification\n- Gestion des Classes",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
@@ -181,6 +181,60 @@
 						"description": "Se connecter avec un compte existant.\n\n**Body (JSON):**\n```json\n{\n  \"email\": \"admin@edtech.com\",\n  \"password\": \"Admin123!\"\n}\n```\n\n**Réponse (200):**\n```json\n{\n  \"token\": \"eyJhbGciOiJIUzI1NiIs...\",\n  \"user\": {\n    \"id\": 1,\n    \"email\": \"admin@edtech.com\",\n    \"role\": \"ADMIN\"\n  }\n}\n```\n\n**Erreurs possibles:**\n- `400` - Email ou mot de passe manquant\n- `401` - Email ou mot de passe incorrect"
 					},
 					"response": []
+				},
+				{
+					"name": "Logout",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Logout successful\", function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('message');",
+									"});",
+									"",
+									"// Optionnel : nettoyer les variables d'environnement",
+									"pm.environment.unset(\"auth_token\");",
+									"pm.environment.unset(\"user_id\");",
+									"pm.environment.unset(\"user_email\");",
+									"pm.environment.unset(\"user_role\");",
+									"console.log(\"User logged out and environment variables cleared\");"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/logout",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"logout"
+							]
+						},
+						"description": "Se déconnecter du système.\n\n**Note:** Avec JWT, le logout est principalement géré côté client. Cette route confirme l'action et permet de nettoyer les variables d'environnement.\n\n**Réponse (200):**\n```json\n{\n  \"message\": \"Déconnexion réussie\"\n}\n```\n\n**Important:** Le frontend doit supprimer le token du localStorage/sessionStorage après cette requête."
+					},
+					"response": []
 				}
 			],
 			"description": "Endpoints d'authentification (inscription et connexion)"
@@ -280,6 +334,300 @@
 				}
 			],
 			"description": "Exemples de routes nécessitant une authentification JWT"
+		},
+		{
+			"name": "Classes",
+			"item": [
+				{
+					"name": "Create Class",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test(\"Response has class ID\", function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('id');",
+									"    pm.environment.set(\"class_id\", jsonData.id);",
+									"});",
+									"",
+									"pm.test(\"Response has class name\", function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('name');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"6ème A\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/classes",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"classes"
+							]
+						},
+						"description": "Créer une nouvelle classe"
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Classes",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response is an array\", function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.be.an('array');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/classes",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"classes"
+							]
+						},
+						"description": "Récupérer toutes les classes"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Class By ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response has class details\", function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('id');",
+									"    pm.expect(jsonData).to.have.property('name');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/classes/{{class_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"classes",
+								"{{class_id}}"
+							]
+						},
+						"description": "Récupérer une classe par son ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Class With Students",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response has students array\", function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('students');",
+									"    pm.expect(jsonData.students).to.be.an('array');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/classes/{{class_id}}/students",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"classes",
+								"{{class_id}}",
+								"students"
+							]
+						},
+						"description": "Récupérer une classe avec la liste de ses étudiants"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Class",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Class name updated\", function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('name');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"6ème A - Mise à jour\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/classes/{{class_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"classes",
+								"{{class_id}}"
+							]
+						},
+						"description": "Modifier le nom d'une classe"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Class",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Success message received\", function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('message');",
+									"    pm.environment.unset(\"class_id\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/classes/{{class_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"classes",
+								"{{class_id}}"
+							]
+						},
+						"description": "Supprimer une classe"
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints pour la gestion des classes"
 		}
 	],
 	"event": [

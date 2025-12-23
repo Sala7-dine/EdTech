@@ -1,6 +1,7 @@
 import express, { Application } from 'express';
 import cors from 'cors';
 import authRoutes from './routes/auth.routes';
+import classRoutes from './routes/class.routes';
 import { errorHandler } from './middlewares/error.middleware';
 
 const app: Application = express();
@@ -12,6 +13,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/classes', classRoutes);
 
 // Route de test
 app.get('/api/health', (req, res) => {
