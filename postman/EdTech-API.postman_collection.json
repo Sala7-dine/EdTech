@@ -2,7 +2,7 @@
 	"info": {
 		"_postman_id": "edtech-auth-collection",
 		"name": "EdTech - API Complete",
-		"description": "Collection Postman pour tester l'API EdTech.\n\n**Base URL:** http://localhost:3000\n\n**Modules disponibles:**\n- Authentification\n- Gestion des Classes",
+		"description": "Collection Postman pour tester l'API EdTech.\n\n**Base URL:** http://localhost:3000\n\n**Modules disponibles:**\n- Authentification\n- Gestion des Classes\n- Gestion des Étudiants\n- Gestion des Matières",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
@@ -628,6 +628,608 @@
 				}
 			],
 			"description": "Endpoints pour la gestion des classes"
+		},
+		{
+			"name": "Students",
+			"item": [
+				{
+					"name": "Create Student",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test(\"Response has student ID\", function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('id');",
+									"    pm.environment.set(\"student_id\", jsonData.id);",
+									"});",
+									"",
+									"pm.test(\"Student is assigned to a class\", function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('classId');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"firstName\": \"Jean\",\n  \"lastName\": \"Dupont\",\n  \"classId\": {{class_id}}\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/students",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"students"
+							]
+						},
+						"description": "Créer un nouvel étudiant et l'assigner à une classe"
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Students",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response is an array\", function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.be.an('array');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/students",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"students"
+							]
+						},
+						"description": "Récupérer tous les étudiants"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Student By ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response includes class information\", function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('class');",
+									"    pm.expect(jsonData.class).to.have.property('id');",
+									"    pm.expect(jsonData.class).to.have.property('name');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/students/{{student_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"students",
+								"{{student_id}}"
+							]
+						},
+						"description": "Récupérer un étudiant par son ID avec les informations de sa classe"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Students By Class ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response is an array\", function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.be.an('array');",
+									"});",
+									"",
+									"pm.test(\"All students belong to the specified class\", function () {",
+									"    const jsonData = pm.response.json();",
+									"    const classId = parseInt(pm.environment.get(\"class_id\"));",
+									"    jsonData.forEach(student => {",
+									"        pm.expect(student.classId).to.eql(classId);",
+									"    });",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/students/class/{{class_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"students",
+								"class",
+								"{{class_id}}"
+							]
+						},
+						"description": "Récupérer tous les étudiants d'une classe spécifique"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Student",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Student information updated\", function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('id');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"firstName\": \"Jean-Pierre\",\n  \"lastName\": \"Dupont\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/students/{{student_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"students",
+								"{{student_id}}"
+							]
+						},
+						"description": "Modifier les informations d'un étudiant (nom, prénom ou classe)"
+					},
+					"response": []
+				},
+				{
+					"name": "Change Student Class",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Student class changed\", function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('classId');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"classId\": {{class_id}}\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/students/{{student_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"students",
+								"{{student_id}}"
+							]
+						},
+						"description": "Changer un étudiant de classe"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Student",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Success message received\", function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('message');",
+									"    pm.environment.unset(\"student_id\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/students/{{student_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"students",
+								"{{student_id}}"
+							]
+						},
+						"description": "Supprimer un étudiant"
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints pour la gestion des étudiants et leur association aux classes"
+		},
+		{
+			"name": "Subjects",
+			"item": [
+				{
+					"name": "Create Subject",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test(\"Response has subject ID\", function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('id');",
+									"    pm.environment.set(\"subject_id\", jsonData.id);",
+									"});",
+									"",
+									"pm.test(\"Response has subject name\", function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('name');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Mathématiques\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/subjects",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"subjects"
+							]
+						},
+						"description": "Créer une nouvelle matière"
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Subjects",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response is an array\", function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.be.an('array');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/subjects",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"subjects"
+							]
+						},
+						"description": "Récupérer toutes les matières"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Subject By ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response has subject details\", function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('id');",
+									"    pm.expect(jsonData).to.have.property('name');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/subjects/{{subject_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"subjects",
+								"{{subject_id}}"
+							]
+						},
+						"description": "Récupérer une matière par son ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Subject",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Subject name updated\", function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('name');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Mathématiques Avancées\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/subjects/{{subject_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"subjects",
+								"{{subject_id}}"
+							]
+						},
+						"description": "Modifier le nom d'une matière"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Subject",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Success message received\", function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('message');",
+									"    pm.environment.unset(\"subject_id\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/subjects/{{subject_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"subjects",
+								"{{subject_id}}"
+							]
+						},
+						"description": "Supprimer une matière"
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints pour la gestion des matières (subjects)"
 		}
 	],
 	"event": [
