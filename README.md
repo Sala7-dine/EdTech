@@ -37,9 +37,14 @@ Application complète de gestion de présence pour établissements scolaires, d�
   - Lister toutes les matières
   - Gestion des matières enseignées
 
+- **📅 Gestion des Séances**
+  - Créer, modifier, supprimer des séances de cours
+  - Planifier les cours (date, classe, matière, professeur)
+  - Consulter les séances par classe ou par professeur
+  - Afficher les détails complets avec relations
+
 ### 🚧 Modules à Venir
 
-- Gestion des sessions de cours
 - Enregistrement des présences
 - Rapports et statistiques
 - Interface frontend React
@@ -138,6 +143,7 @@ http://localhost:3000/api
 - [**Classes**](backend/src/docs/CLASSES.md) - Gestion des classes
 - [**Étudiants**](backend/src/docs/STUDENTS.md) - Gestion des étudiants
 - [**Matières**](backend/src/docs/SUBJECTS.md) - Gestion des matières
+- [**Séances**](backend/src/docs/SESSIONS.md) - Gestion des séances de cours
 
 ### Collection Postman
 

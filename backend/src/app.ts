@@ -4,6 +4,7 @@ import authRoutes from './routes/auth.routes';
 import classRoutes from './routes/class.routes';
 import studentRoutes from './routes/student.routes';
 import subjectRoutes from './routes/subject.routes';
+import sessionRoutes from './routes/session.routes';
 import { errorHandler } from './middlewares/error.middleware';
 
 const app: Application = express();
@@ -18,6 +19,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/classes', classRoutes);
 app.use('/api/students', studentRoutes);
 app.use('/api/subjects', subjectRoutes);
+app.use('/api/sessions', sessionRoutes);
 
 // Route de test
 app.get('/api/health', (req, res) => {
